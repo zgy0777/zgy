@@ -19,4 +19,6 @@ Route::get('/help', 'StaticPagesController@help')->name('help');
 //关于页
 Route::get('/about', 'StaticPagesController@about')->name('about');
 
+//注册页 todo::这里的signup与resource默认的有冲突，覆盖了
+Route::get('/signup','UsersController@create')->name('signup');
 
