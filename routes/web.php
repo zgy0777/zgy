@@ -22,3 +22,5 @@ Route::get('/about', 'StaticPagesController@about')->name('about');
 //注册页 todo::这里的signup与resource默认的有冲突，覆盖了
 Route::get('/signup','UsersController@create')->name('signup');
 
+//Resource资源组
+Route::resource('users','UsersController');
