@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 //引入User模型，并在控制器依赖注入User，可携带参数通过blade模版传递到视图上
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
 class UsersController extends Controller
 {
     //注册页
@@ -34,6 +35,7 @@ class UsersController extends Controller
 
 
         //TODO::渲染跳转
+        Auth::login($user);
         session()->flash('success','欢迎，您将在此开启一段新的旅程');
         //此时的user会自动回去MODEL的主键
         return redirect()->route('users.show',[$user]);

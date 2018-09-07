@@ -24,3 +24,10 @@ Route::get('/signup','UsersController@create')->name('signup');
 
 //Resource资源组
 Route::resource('users','UsersController');
+
+//session 会话管理登录
+Route::get('login', 'SessionsController@create')->name('login');
+Route::post('login', 'SessionsController@store')->name('login');
+Route::delete('logout', 'SessionsController@destroy')->name('logout');
+
+
