@@ -7,6 +7,15 @@ use Illuminate\Support\Facades\Auth;
 class SessionsController extends Controller
 {
     //
+
+    public function __construct()
+    {
+        $this->middleware('guest',[
+            //只允许未登录的用户进行以下操作
+           'only'=>['create']
+        ]);
+    }
+
     public function create(){
         return view('sessions.create');
     }
@@ -21,7 +30,7 @@ class SessionsController extends Controller
         //TODO:逻辑
         if(Auth::attempt($credentials,$request->has('remember'))){
             session()->flash('success','登录成功');
-            return redirect()->route('users.show',[Auth::user()]);
+            return redirect()->intended(route('users.show',[Auth::user()]));
         }else{
             session()->flash('danger','非常抱歉，您的邮箱或密码不匹配');
             return redirect()->back();
