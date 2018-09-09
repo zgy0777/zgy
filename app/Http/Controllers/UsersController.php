@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 //引入User模型，并在控制器依赖注入User，可携带参数通过blade模版传递到视图上
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 class UsersController extends Controller
 {
     public function __construct(){
@@ -13,7 +14,8 @@ class UsersController extends Controller
         //TODO::except了show。未登录应可显示其他人的主页
         //只允许未登录用户访问注册/登录/查看用户主页
         $this->middleware('auth',[
-           'except'=>['store','show','create','index']
+            //控制器中添加 confirmEmail动作，允许未认证用户查看该视图
+           'except'=>['store','show','create','index','confirmEmail']
      ]);
 
         //TODO::只允许guest访问create方法，其他都不允许
@@ -49,12 +51,50 @@ class UsersController extends Controller
         ]);
 
 
-        //TODO::渲染跳转
-        Auth::login($user);
-        session()->flash('success','欢迎，您将在此开启一段新的旅程');
-        //此时的user会自动回去MODEL的主键
-        return redirect()->route('users.show',[$user]);
+        $this->sendEmailConfirmationTo($user);
+        session()->flash('success','邮件已发送到你的注册邮箱上，请注意查收');
+        return redirect('/');
+
+//        //TODO::渲染跳转
+//        Auth::login($user);
+//        session()->flash('success','欢迎，您将在此开启一段新的旅程');
+//        //此时的user会自动回去MODEL的主键
+//        return redirect()->route('users.show',[$user]);
     }
+
+    protected function sendEmailConfirmationTo($user)
+    {
+        $view = 'emails.confirm';
+        $data = compact('user');
+        $from = 'admin@qq.com';
+        $name = 'Xzibit';
+        $to = $user->email;
+        $subject = "感谢注册 Sample 应用！请确认你的邮箱。";
+
+        Mail::send($view, $data, function ($message) use ($from, $name, $to, $subject) {
+            $message->from($from, $name)->to($to)->subject($subject);
+        });
+    }
+
+    public function confirmEmail($token)
+    {
+        //根据路由传输过来的ACTIONVATION_TOKEN在数据库中查找相应用户
+        //ELO的WHERE方法接收两个参数，第一个查找字段名称，第二个位对应的值。返回结果是一个数组
+        //使用fristOrFail取出第一个用户，查询不到则404 not found
+        $user = User::where('activation_token', $token)->firstOrFail();
+        //若查询到用户是，令牌激活设置为true
+        $user->activated = true;
+        //并将激活令牌设为null
+        $user->activation_token = null;
+        //保存
+        $user->save();
+
+        Auth::login($user);
+        session()->flash('success', '恭喜你，激活成功！');
+        return redirect()->route('users.show', [$user]);
+    }
+
+
 
     public function edit(User $user){
 
