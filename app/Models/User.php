@@ -6,10 +6,25 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 use App\Notifications\ResetPassword;
-
+use App\Models\Status;
 class User extends Authenticatable
 {
     use Notifiable;
+
+    public function statuses(){
+
+        //将User模型绑定status模型
+         return   $this->hasMany(Status::class);
+
+    }
+
+    //用户发布过的微博，调用用户实例并取去其所有的微博
+    public function feed(){
+
+        return $this->statuses()->orderBy('created_at','desc');
+    }
+
+
 
     public function sendPasswordResetNotification($token)
     {
@@ -51,6 +66,8 @@ class User extends Authenticatable
         });
 
     }
+
+
 
 
 

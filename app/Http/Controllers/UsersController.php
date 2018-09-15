@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 //引入User模型，并在控制器依赖注入User，可携带参数通过blade模版传递到视图上
 use App\Models\User;
+use App\Models\Status;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 class UsersController extends Controller
@@ -15,8 +16,8 @@ class UsersController extends Controller
         //只允许未登录用户访问注册/登录/查看用户主页
         $this->middleware('auth',[
             //控制器中添加 confirmEmail动作，允许未认证用户查看该视图
-           'except'=>['store','show','create','index','confirmEmail']
-     ]);
+            'except'=>['store','show','create','index','confirmEmail']
+        ]);
 
         //TODO::只允许guest访问create方法，其他都不允许
         $this->middleware('guest',[
@@ -30,10 +31,12 @@ class UsersController extends Controller
         return view('users.create');
     }
 
-    public function show(User $user){
-
-
-        return view('users.show',compact('user'));
+    public function show(User $user)
+    {
+        $statuses = $user->statuses()
+            ->orderBy('created_at', 'desc')
+            ->paginate(30);
+        return view('users.show', compact('user', 'statuses'));
     }
 
     public function store(Request $request){
@@ -146,3 +149,5 @@ class UsersController extends Controller
     }
 
 }
+
+
