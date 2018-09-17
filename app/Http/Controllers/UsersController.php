@@ -45,8 +45,6 @@ class UsersController extends Controller
 
 
 
-
-
     //注册页
     public function create(){
         return view('users.create');
@@ -63,7 +61,7 @@ class UsersController extends Controller
     public function store(Request $request){
         //验证
         $this->validate($request,[
-            'name'=>'required|min:3|max:6',
+            'name'=>'required|min:3|max:30',
             'email'=>'required|email|unique:users|max:255',
             'password'=>'required|confirmed|min:6'
         ]);
