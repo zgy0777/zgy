@@ -17,6 +17,9 @@
           {{--引入局部视图，并且代入参数（当前登录用户实例的数据集）--}}
           @include('shared._user_info', ['user' => Auth::user()])
         </section>
+        <section class="stats">
+          @include('shared._stats', ['user' => Auth::user()])
+        </section>
       </aside>
     </div>
   @else
